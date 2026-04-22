@@ -1,0 +1,38 @@
+{
+  "name": "parel",
+  "version": "0.0.1",
+  "description": "Parel SDK for JavaScript/TypeScript. AI models, GPU rental (BYOM), compare, and credits via a single API. Official client for parel.cloud.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "parel",
+    "ai",
+    "llm",
+    "gpu",
+    "openai",
+    "sdk",
+    "byom",
+    "huggingface",
+    "inference",
+    "compare"
+  ],
+  "author": "Parel Cloud <hello@parel.cloud>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parel-cloud/parel-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/parel-cloud/parel-js/issues"
+  },
+  "homepage": "https://parel.cloud",
+  "engines": {
+    "node": ">=18"
+  }
+}
