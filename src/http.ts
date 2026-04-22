@@ -37,7 +37,7 @@ export interface RequestOptions {
   maxRetries?: number;
 }
 
-const DEFAULT_USER_AGENT = "parel-js/0.1.0";
+const DEFAULT_USER_AGENT = "parel-node/0.1.0";
 
 const IDEMPOTENT = new Set(["GET", "HEAD", "DELETE", "PUT"]);
 

@@ -7,7 +7,7 @@
  *   const parel = new Parel({ apiKey: process.env.PAREL_API_KEY });
  *   const credits = await parel.credits();
  *
- * Full reference: https://github.com/parel-cloud/parel-js
+ * Full reference: https://github.com/parel-cloud/parel-node
  */
 
 export { Parel } from "./client.js";

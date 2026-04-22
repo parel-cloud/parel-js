@@ -49,10 +49,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/parel-cloud/parel-js.git"
+    "url": "git+https://github.com/parel-cloud/parel-node.git"
   },
   "bugs": {
-    "url": "https://github.com/parel-cloud/parel-js/issues"
+    "url": "https://github.com/parel-cloud/parel-node/issues"
   },
   "homepage": "https://parel.cloud",
   "engines": {

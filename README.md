@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://parel.cloud">
-    <img src="https://raw.githubusercontent.com/parel-cloud/parel-js/main/assets/hero.svg" alt="Parel - Run, use, compare 100+ AI models through one API" width="760"/>
+    <img src="https://raw.githubusercontent.com/parel-cloud/parel-node/main/assets/hero.svg" alt="Parel - Run, use, compare 100+ AI models through one API" width="760"/>
   </a>
 </p>
 
@@ -14,7 +14,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@parel-cloud/node"><img alt="npm" src="https://img.shields.io/npm/v/@parel-cloud/node.svg?color=%230b5fff&label=npm&logo=npm"/></a>
   <a href="https://www.npmjs.com/package/@parel-cloud/node"><img alt="downloads" src="https://img.shields.io/npm/dm/@parel-cloud/node.svg?color=%230b5fff"/></a>
-  <a href="https://github.com/parel-cloud/parel-js"><img alt="GitHub" src="https://img.shields.io/github/stars/parel-cloud/parel-js?style=social"/></a>
+  <a href="https://github.com/parel-cloud/parel-node"><img alt="GitHub" src="https://img.shields.io/github/stars/parel-cloud/parel-node?style=social"/></a>
   <a href="./LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e"/></a>
   <a href="#"><img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white"/></a>
   <a href="#"><img alt="Node.js 18+" src="https://img.shields.io/badge/Node.js-18%2B-43853d?logo=node.js&logoColor=white"/></a>
@@ -24,7 +24,7 @@
   <a href="https://parel.cloud"><b>parel.cloud</b></a> ·
   <a href="https://app.parel.cloud">Dashboard</a> ·
   <a href="https://docs.parel.cloud">Docs</a> ·
-  <a href="https://github.com/parel-cloud/parel-js/issues">Issues</a>
+  <a href="https://github.com/parel-cloud/parel-node/issues">Issues</a>
 </p>
 
 ---
@@ -92,7 +92,7 @@ Sign up at [parel.cloud](https://parel.cloud) and every new account gets **$1 fr
 ## How it works
 
 <p align="center">
-  <img alt="Parel architecture: your app uses @parel-cloud/node to call api.parel.cloud which routes to 100+ AI providers" src="https://raw.githubusercontent.com/parel-cloud/parel-js/main/assets/architecture.svg" width="900"/>
+  <img alt="Parel architecture: your app uses @parel-cloud/node to call api.parel.cloud which routes to 100+ AI providers" src="https://raw.githubusercontent.com/parel-cloud/parel-node/main/assets/architecture.svg" width="900"/>
 </p>
 
 Your app calls `@parel-cloud/node`. The SDK speaks HTTPS + Bearer auth to `api.parel.cloud`. Parel routes the request to the right provider, enforces your budget, handles PII, and returns an OpenAI-shaped response. The SDK never holds vendor keys. You never glue five client libraries together.
@@ -407,7 +407,7 @@ Pass `baseUrl` to the `Parel` constructor. Every path is `/v1/...`.
 Parel ships an opt-in KVKK mode: PII masking + Turkey-resident data. See [docs.parel.cloud/kvkk](https://docs.parel.cloud/kvkk).
 
 **How do I report a bug?**
-[github.com/parel-cloud/parel-js/issues](https://github.com/parel-cloud/parel-js/issues). Include your `requestId` from the error.
+[github.com/parel-cloud/parel-node/issues](https://github.com/parel-cloud/parel-node/issues). Include your `requestId` from the error.
 
 ---
 
@@ -417,7 +417,7 @@ Parel ships an opt-in KVKK mode: PII masking + Turkey-resident data. See [docs.p
 * **v0.3** - Webhooks, batch tier helpers, OpenAPI-codegen types
 * **v1.0** - Stable surface, semver guarantees
 
-Track releases: [github.com/parel-cloud/parel-js/releases](https://github.com/parel-cloud/parel-js/releases).
+Track releases: [github.com/parel-cloud/parel-node/releases](https://github.com/parel-cloud/parel-node/releases).
 
 ---
 
@@ -427,7 +427,7 @@ Track releases: [github.com/parel-cloud/parel-js/releases](https://github.com/pa
 * Dashboard: [app.parel.cloud](https://app.parel.cloud)
 * API reference: [docs.parel.cloud](https://docs.parel.cloud)
 * npm: [npmjs.com/package/@parel-cloud/node](https://www.npmjs.com/package/@parel-cloud/node)
-* GitHub: [github.com/parel-cloud/parel-js](https://github.com/parel-cloud/parel-js)
+* GitHub: [github.com/parel-cloud/parel-node](https://github.com/parel-cloud/parel-node)
 
 ## License
 
