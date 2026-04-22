@@ -2,12 +2,21 @@
  * Parel SDK root client. Instances compose the HTTP layer with all namespaces.
  *
  *   const parel = new Parel({ apiKey: process.env.PAREL_API_KEY });
- *   await parel.credits();
- *   await parel.images.generate({ model: "flux-schnell", prompt: "cat" });
+ *   await parel.credits.get();
+ *   await parel.tasks.cancel(taskId);
+ *   const openai = await parel.openai;
+ *   await openai.chat.completions.create({ model: "qwen3.5-72b", messages: [...] });
  */
 
-import { HttpClient } from "./http.js";
 import { ParelConfigError } from "./errors.js";
+import { HttpClient } from "./http.js";
+import { CompareNamespace } from "./namespaces/compare.js";
+import { CreditsNamespace } from "./namespaces/credits.js";
+import { AudioNamespace, ImagesNamespace, VideosNamespace } from "./namespaces/generations.js";
+import { GpuNamespace } from "./namespaces/gpu.js";
+import { ModelsNamespace } from "./namespaces/models.js";
+import { createOpenAIAsync, type OpenAIClient } from "./namespaces/openai.js";
+import { TasksNamespace } from "./namespaces/tasks.js";
 
 export interface ParelOptions {
   /**
@@ -33,7 +42,6 @@ const DEFAULT_MAX_RETRIES = 2;
 
 function readEnvApiKey(): string | undefined {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const proc = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process;
     return proc?.env?.["PAREL_API_KEY"];
   } catch {
@@ -44,6 +52,18 @@ function readEnvApiKey(): string | undefined {
 export class Parel {
   readonly http: HttpClient;
   readonly baseUrl: string;
+  readonly apiKey: string;
+
+  readonly tasks: TasksNamespace;
+  readonly credits: CreditsNamespace;
+  readonly models: ModelsNamespace;
+  readonly gpu: GpuNamespace;
+  readonly compare: CompareNamespace;
+  readonly images: ImagesNamespace;
+  readonly videos: VideosNamespace;
+  readonly audio: AudioNamespace;
+
+  private _openai?: Promise<OpenAIClient>;
 
   constructor(options: ParelOptions = {}) {
     const apiKey = options.apiKey ?? readEnvApiKey();
@@ -57,6 +77,7 @@ export class Parel {
     const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     const maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
 
+    this.apiKey = apiKey;
     this.baseUrl = baseUrl;
     this.http = new HttpClient({
       apiKey,
@@ -66,5 +87,29 @@ export class Parel {
       fetchImpl: options.fetch,
       userAgent: options.userAgent,
     });
+
+    this.tasks = new TasksNamespace(this.http);
+    this.credits = new CreditsNamespace(this.http);
+    this.models = new ModelsNamespace(this.http);
+    this.gpu = new GpuNamespace(this.http);
+    this.compare = new CompareNamespace(this.http);
+    this.images = new ImagesNamespace(this.http);
+    this.videos = new VideosNamespace(this.http);
+    this.audio = new AudioNamespace(this.http);
+  }
+
+  /**
+   * Promise resolving to the official OpenAI client, pre-configured for Parel.
+   * Requires the `openai` peer dep. Cached — repeated access returns the same
+   * Promise (and therefore same instance).
+   *
+   *   const openai = await parel.openai;
+   *   await openai.chat.completions.create({ model: "...", messages: [...] });
+   */
+  get openai(): Promise<OpenAIClient> {
+    if (!this._openai) {
+      this._openai = createOpenAIAsync({ apiKey: this.apiKey, baseUrl: this.baseUrl });
+    }
+    return this._openai;
   }
 }
