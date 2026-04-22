@@ -3,11 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   ParelAuthenticationError,
   ParelBudgetExceededError,
+  ParelCapacityExhaustedError,
   ParelConflictError,
+  ParelDeploymentFailedError,
+  ParelDeploymentNotReadyError,
   ParelError,
   ParelNotFoundError,
+  ParelPiiBlockedError,
+  ParelProviderError,
   ParelRateLimitError,
   ParelServerError,
+  ParelTaskNotCancellableError,
   ParelValidationError,
   parseHttpError,
 } from "../src/errors.js";
@@ -97,5 +103,89 @@ describe("parseHttpError", () => {
       fakeHeaders({ "x-request-id": "req_header" }),
     );
     expect(err.requestId).toBe("req_header");
+  });
+});
+
+describe("parseHttpError code-specific subclasses", () => {
+  it("code=task_not_cancellable → ParelTaskNotCancellableError (extends Conflict)", () => {
+    const err = parseHttpError(
+      409,
+      {
+        error: {
+          message: "Task already in terminal state: completed",
+          code: "task_not_cancellable",
+          type: "invalid_request_error",
+        },
+      },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelTaskNotCancellableError);
+    expect(err).toBeInstanceOf(ParelConflictError);
+    expect(err).toBeInstanceOf(ParelError);
+    expect(err.code).toBe("task_not_cancellable");
+    expect(err.status).toBe(409);
+  });
+
+  it("code=pii_blocked → ParelPiiBlockedError (extends Validation)", () => {
+    const err = parseHttpError(
+      400,
+      { error: { message: "PII detected and mode is 'block': email, phone", code: "pii_blocked" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelPiiBlockedError);
+    expect(err).toBeInstanceOf(ParelValidationError);
+    expect(err.code).toBe("pii_blocked");
+  });
+
+  it("code=capacity_exhausted → ParelCapacityExhaustedError (extends Server)", () => {
+    const err = parseHttpError(
+      503,
+      { error: { message: "All GPU providers at capacity", code: "capacity_exhausted" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelCapacityExhaustedError);
+    expect(err).toBeInstanceOf(ParelServerError);
+    expect(err.code).toBe("capacity_exhausted");
+  });
+
+  it("code=deployment_not_ready → ParelDeploymentNotReadyError (extends Conflict)", () => {
+    const err = parseHttpError(
+      409,
+      { error: { message: "Deployment not ready: starting", code: "deployment_not_ready" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelDeploymentNotReadyError);
+    expect(err).toBeInstanceOf(ParelConflictError);
+  });
+
+  it("code=deployment_failed → ParelDeploymentFailedError", () => {
+    const err = parseHttpError(
+      502,
+      { error: { message: "Deployment crash loop", code: "deployment_failed" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelDeploymentFailedError);
+  });
+
+  it("code=provider_error → ParelProviderError", () => {
+    const err = parseHttpError(
+      502,
+      { error: { message: "Upstream provider 500", code: "provider_error", type: "upstream_error" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelProviderError);
+    expect(err.type).toBe("upstream_error");
+  });
+
+  it("unknown code falls back to status-based subclass", () => {
+    const err = parseHttpError(
+      409,
+      { error: { message: "some new 409", code: "some_new_code" } },
+      fakeHeaders(),
+    );
+    expect(err).toBeInstanceOf(ParelConflictError);
+    expect(err).not.toBeInstanceOf(ParelTaskNotCancellableError);
+    expect(err).not.toBeInstanceOf(ParelDeploymentNotReadyError);
+    expect(err.code).toBe("some_new_code");
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@parel-cloud/node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Parel SDK for JavaScript/TypeScript. 100+ AI models, GPU rental (BYOM), compare, and credits via a single OpenAI-compatible API. Official client for parel.cloud.",
   "type": "module",
   "main": "./dist/index.cjs",

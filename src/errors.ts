@@ -128,22 +128,65 @@ export class ParelAPIError extends ParelError {
   }
 }
 
+// --------------------------------------------------------------------------
+// Code-specific subclasses (refinement — match by error.code first, then status)
+// These enable `err instanceof ParelTaskNotCancellableError` etc. while
+// still satisfying `err instanceof ParelConflictError` / `ParelError`.
+// --------------------------------------------------------------------------
+
+export class ParelTaskNotCancellableError extends ParelConflictError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, code: opts.code ?? "task_not_cancellable" });
+    this.name = "ParelTaskNotCancellableError";
+  }
+}
+
+export class ParelPiiBlockedError extends ParelValidationError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, code: opts.code ?? "pii_blocked" });
+    this.name = "ParelPiiBlockedError";
+  }
+}
+
+export class ParelCapacityExhaustedError extends ParelServerError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, status: opts.status ?? 503, code: opts.code ?? "capacity_exhausted" });
+    this.name = "ParelCapacityExhaustedError";
+  }
+}
+
+export class ParelDeploymentNotReadyError extends ParelConflictError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, code: opts.code ?? "deployment_not_ready" });
+    this.name = "ParelDeploymentNotReadyError";
+  }
+}
+
+export class ParelDeploymentFailedError extends ParelError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, status: opts.status ?? 502, code: opts.code ?? "deployment_failed" });
+    this.name = "ParelDeploymentFailedError";
+  }
+}
+
+export class ParelProviderError extends ParelError {
+  constructor(message: string, opts: ParelErrorOptions = {}) {
+    super(message, { ...opts, status: opts.status ?? 502, code: opts.code ?? "provider_error" });
+    this.name = "ParelProviderError";
+  }
+}
+
 /**
  * Parse an HTTP error response body into a typed ParelError.
  *
  * Expects OpenAI-compatible envelope: `{ "error": { message, type, code, param, request_id } }`.
  * Falls back to `ParelAPIError` when body is opaque or non-envelope.
  *
- * Mapping by HTTP status (primary) + by `error.code` (refinement):
- *   401 → ParelAuthenticationError
- *   402 → ParelBudgetExceededError
- *   403 → ParelPermissionError
- *   404 → ParelNotFoundError
- *   409 → ParelConflictError
- *   422 → ParelValidationError
- *   429 → ParelRateLimitError (retry-after extracted)
- *   4xx (other) → ParelValidationError
- *   5xx → ParelServerError
+ * Resolution order:
+ *   1. By `error.code` — specific subclass (task_not_cancellable, pii_blocked,
+ *      capacity_exhausted, deployment_not_ready, deployment_failed, provider_error)
+ *   2. By HTTP status — generic subclass (401 auth, 402 budget, 403 perm, 404 not
+ *      found, 409 conflict, 422 validation, 429 rate limit, 4xx validation, 5xx server)
  */
 export function parseHttpError(
   status: number,
@@ -170,6 +213,15 @@ export function parseHttpError(
 
   const opts: ParelErrorOptions = { code, type, status, param, raw: body };
   if (requestId) opts.requestId = requestId;
+
+  // 1. Code-specific subclasses (checked before status mapping so these beat
+  //    the generic ParelConflictError / ParelServerError).
+  if (code === "task_not_cancellable") return new ParelTaskNotCancellableError(message, opts);
+  if (code === "pii_blocked") return new ParelPiiBlockedError(message, opts);
+  if (code === "capacity_exhausted") return new ParelCapacityExhaustedError(message, opts);
+  if (code === "deployment_not_ready") return new ParelDeploymentNotReadyError(message, opts);
+  if (code === "deployment_failed") return new ParelDeploymentFailedError(message, opts);
+  if (code === "provider_error") return new ParelProviderError(message, opts);
 
   if (status === 401) return new ParelAuthenticationError(message, opts);
   if (status === 402) return new ParelBudgetExceededError(message, opts);

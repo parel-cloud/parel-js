@@ -27,6 +27,12 @@ export {
   ParelRateLimitError,
   ParelBudgetExceededError,
   ParelServerError,
+  ParelTaskNotCancellableError,
+  ParelPiiBlockedError,
+  ParelCapacityExhaustedError,
+  ParelDeploymentNotReadyError,
+  ParelDeploymentFailedError,
+  ParelProviderError,
 } from "./errors.js";
 
 export type { ParelErrorOptions } from "./errors.js";
