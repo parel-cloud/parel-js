@@ -16,8 +16,9 @@ async function main() {
 
   const openai = await parel.openai;
   const chat = await openai.chat.completions.create({
-    model: "qwen3.5-72b",
+    model: "gpt-5.4-nano",
     messages: [{ role: "user", content: "Say hi in one word." }],
+    max_tokens: 10,
   });
   console.log("chat:", chat.choices[0]?.message?.content);
 }
